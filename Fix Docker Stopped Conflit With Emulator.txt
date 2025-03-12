@@ -1,0 +1,7 @@
+Khởi động lại WSL mở PowerShell với quyền Admin : wsl --shutdown
+Kiểm tra trạng thái WSL : wsl -l -v
+Cài đặt WSL : wsl --install
+Cài đặt lại WSL : 
+wsl --unregister docker-desktop
+wsl --unregister docker-desktop-data
+Đặt WSL2 làm phiên bản mặc định : wsl --set-default-version 2
