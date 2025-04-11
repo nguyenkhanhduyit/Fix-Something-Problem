@@ -1,7 +1,74 @@
 Khởi động lại WSL mở PowerShell với quyền Admin : wsl --shutdown
+
 Kiểm tra trạng thái WSL : wsl -l -v
+
+Khởi động instance WSL : wsl -d docker-desktop
+
+cài đặt các thành phần cần thiết cho WSL, bao gồm Virtual Machine Platform, mà không cài thêm distro nào (như Ubuntu) : wsl.exe --install --no-distribution
+
 Cài đặt WSL : wsl --install
 Cài đặt lại WSL : 
 wsl --unregister docker-desktop
 wsl --unregister docker-desktop-data
+
 Đặt WSL2 làm phiên bản mặc định : wsl --set-default-version 2
+1. Cài đặt lại WSL và xóa Ubuntu
+Chạy từng dòng trong PowerShell (Admin):
+
+wsl --unregister Ubuntu
+wsl --uninstall
+
+
+Bật các tính năng Windows cần thiết
+
+dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
+dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
+dism.exe /online /enable-feature /featurename:HypervisorPlatform /all /norestart
+dism.exe /online /enable-feature /featurename:Hyper-V /all /norestart
+
+
+Kiểm tra lại trạng thái
+Sau khi khởi động lại, mở PowerShell (admin) và gõ:
+
+systeminfo | findstr /i "Virtualization"
+
+Kết quả mong muốn:
+- Virtualization Enabled In Firmware: Yes
+
+Nếu vẫn là No, thì BIOS chưa bật ảo hóa.
+
+cài Ubuntu sau:
+
+powershell
+wsl --install -d Ubuntu
+
+
+
+Xác nhận nhanh: Bạn đang dùng Windows Home
+
+Get-ComputerInfo | Select-Object WindowsProductName
+
+
+Bật Hyper-V trên Windows Home (không chính thức)
+
+Tạo một file `.bat` để bật Hyper-V và các tính năng WSL cần thiết bằng script không chính thức
+
+Tạo file enable-hyperv-home.bat
+
+@echo off
+pushd "%~dp0"
+
+echo Enabling Hyper-V on Windows 11 Home...
+dism /online /enable-feature /featurename:Microsoft-Hyper-V-All /all /norestart
+dism /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
+dism /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
+dism /online /enable-feature /featurename:HypervisorPlatform /all /norestart
+
+bcdedit /set hypervisorlaunchtype auto
+
+echo Done. Please restart your computer.
+pause
+
+
+Sau khi khởi động lại:
+wsl --install -d Ubuntu
